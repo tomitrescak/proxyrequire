@@ -26,7 +26,20 @@ function registerGlobals() {
     global.proxyRequire = proxyRequire;
 }
 exports.registerGlobals = registerGlobals;
-function webpackStubLoader(content) {
+function registerNode() {
+    global.$_stubs_$ = {};
+    var Module = require('module');
+    var originalRequire = Module.prototype.require;
+    Module.prototype.require = function (path) {
+        return global.$_stubs_$[path] || originalRequire.apply(this, arguments);
+    };
+}
+exports.registerNode = registerNode;
+function transform(content) {
     return content.replace(/require\s*\((['"]\s*[\w-_\.\/\\]*\s*['"])\)/g, 'proxyRequire(function() { return require($1); }, $1)');
+}
+exports.transform = transform;
+function webpackStubLoader(content) {
+    return transform(content);
 }
 exports.webpackStubLoader = webpackStubLoader;

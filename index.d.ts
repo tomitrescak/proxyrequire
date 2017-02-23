@@ -5,4 +5,6 @@ export declare function FuseBoxStubPlugin(test: any): {
     transform(file: any): void;
 };
 export declare function registerGlobals(): void;
+export declare function registerNode(): void;
+export declare function transform(content: string): string;
 export declare function webpackStubLoader(content: string): string;
