@@ -1,0 +1,26 @@
+{
+  "name": "proxyrequire",
+  "version": "1.0.4",
+  "description": "Proxies module references, can be used with FuseBox, Webpack, pure node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomitrescak/proxyrequire.git"
+  },
+  "keywords": [
+    "node",
+    "fusebox",
+    "stub",
+    "proxy",
+    "webpack"
+  ],
+  "author": "Tomi Trescak <tomi.trescak@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tomitrescak/proxyrequire/issues"
+  },
+  "homepage": "https://github.com/tomitrescak/proxyrequire#readme"
+}
