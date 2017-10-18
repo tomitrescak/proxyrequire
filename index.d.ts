@@ -1,4 +1,8 @@
+export declare function setGlobalStubs(stubs: any): void;
 export declare function proxy(requireFunc: Function, stubs: any): any;
+export declare function mock(path: any, impl: any): void;
+export declare function unmockAll(): void;
+export declare function unmock(path: any): void;
 export declare function proxyRequire(require: Function, path: string): any;
 export declare function FuseBoxStubPlugin(test: any): {
     test: any;
