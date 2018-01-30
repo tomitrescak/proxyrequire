@@ -1,11 +1,20 @@
 "use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var globalStubs = {};
+global.$_stubs_$ = {};
 function setGlobalStubs(stubs) {
-    globalStubs = stubs;
+    globalStubs = __assign({}, globalStubs, stubs);
+    global.$_stubs_$ = globalStubs;
 }
 exports.setGlobalStubs = setGlobalStubs;
-global.$_stubs_$ = global.$_stubs_$ || globalStubs;
 var nodeRegistered = false;
 var firstRequire = null;
 function setFirstRequire(name) {
@@ -36,7 +45,7 @@ function proxy(requireFunc, stubs) {
     var req = requireFunc();
     cleanup();
     req = requireFunc();
-    global.$_stubs_$ = {};
+    global.$_stubs_$ = globalStubs;
     cleanup();
     return req;
 }
@@ -72,6 +81,10 @@ function FuseBoxStubPlugin(test) {
         test: test || /\.js/,
         transform: function (file) {
             file.contents = file.contents.replace(/require\s*\((['"]\s*[\w-_\.\/\\]*\s*['"])\)/g, 'proxyRequire(function() { return require($1); }, $1)');
+            if (file.contents.indexOf('jest.mock') >= 0) {
+                file.contents = file.contents.replace(/jest\.mock\s*\(/g, 'require("proxyrequire").mock(');
+                file.contents = file.contents + '\nrequire("proxyrequire").unmockAll()';
+            }
         }
     };
 }
@@ -89,7 +102,9 @@ function registerNode() {
             var parts = path.split('/');
             var module_name = parts[parts.length - 1];
             setFirstRequire(module_name);
-            return global.$_stubs_$[path] || global.$_stubs_$[module_name] || originalRequire.apply(this, arguments);
+            return (global.$_stubs_$[path] ||
+                global.$_stubs_$[module_name] ||
+                originalRequire.apply(this, arguments));
         };
     }
     nodeRegistered = true;

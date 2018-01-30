@@ -2,12 +2,13 @@ declare var global: any;
 declare var require: any;
 
 var globalStubs = {};
+global.$_stubs_$ = {};
 
 export function setGlobalStubs(stubs) {
-  globalStubs = stubs;
+  globalStubs = { ...globalStubs, ...stubs };
+  global.$_stubs_$ = globalStubs;
 }
 
-global.$_stubs_$ = global.$_stubs_$ || globalStubs;
 let nodeRegistered = false;
 
 let firstRequire = null;
@@ -46,7 +47,7 @@ export function proxy(requireFunc: Function, stubs: any) {
   cleanup();
   req = requireFunc();
 
-  global.$_stubs_$ = {};
+  global.$_stubs_$ = globalStubs;
 
   cleanup();
 
@@ -105,6 +106,13 @@ export function FuseBoxStubPlugin(test) {
         /require\s*\((['"]\s*[\w-_\.\/\\]*\s*['"])\)/g,
         'proxyRequire(function() { return require($1); }, $1)'
       );
+
+      if (file.contents.indexOf('jest.mock') >= 0) {
+        // replace mocks
+        file.contents = file.contents.replace(/jest\.mock\s*\(/g, 'require("proxyrequire").mock(');
+
+        file.contents = file.contents + '\nrequire("proxyrequire").unmockAll()';
+      }
     }
   };
 }
@@ -126,7 +134,11 @@ export function registerNode() {
 
       setFirstRequire(module_name);
 
-      return global.$_stubs_$[path] || global.$_stubs_$[module_name] || originalRequire.apply(this, arguments);
+      return (
+        global.$_stubs_$[path] ||
+        global.$_stubs_$[module_name] ||
+        originalRequire.apply(this, arguments)
+      );
     };
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "proxyrequire",
-  "version": "1.0.18",
+  "version": "1.0.21",
   "description": "Proxies module references, can be used with FuseBox, Webpack, pure node.js",
   "main": "index.js",
   "scripts": {
